@@ -348,9 +348,12 @@ set_user_keypairs_dir_path() {
 }
 
 create_user_keypairs_dir_if_not_exist() {
-  try_silent_with_exit \
-    "mkdir \"${USER_KEYPAIRS_DIR}\"" \
-    "error attempting to create user keypairs dir" 7
+  if [ ! -d "${USER_KEYPAIRS_DIR}" ]; then
+    try_silent_with_exit \
+      "mkdir \"${USER_KEYPAIRS_DIR}\"" \
+      "error attempting to create user keypairs dir" 7
+  fi
+
   try_silent_with_exit \
     "chmod 700 \"${USER_KEYPAIRS_DIR}\"" \
     "error attempting to set permissions on user keypairs dir" 7
