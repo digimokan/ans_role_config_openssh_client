@@ -1,0 +1,3 @@
+# user name of main SSH client user
+openssh_client_user_name: "user2"
+

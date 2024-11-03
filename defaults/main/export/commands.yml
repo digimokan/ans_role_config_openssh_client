@@ -1,0 +1,6 @@
+# command to execute to run the SSH client ssh-keygen command
+openssh_client_keygen_main_cmd: 'ssh-keygen'
+
+# command to execute to run the SSH utility script (provided by this role)
+openssh_client_utility_script_cmd: 'do_ssh_client'
+

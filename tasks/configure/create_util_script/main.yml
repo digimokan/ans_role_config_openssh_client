@@ -1,0 +1,12 @@
+- name: "Create '{{ do_ssh_client_script_path }}' utility script"
+  ansible.builtin.template:
+    dest: "{{ do_ssh_client_script_path }}"
+    src: "do_ssh_client.j2"
+    owner: 'root'
+    mode: '755'
+    force: true
+  vars:
+    do_ssh_client_script_path: "/usr/local/bin/{{ openssh_client_utility_script_cmd }}"
+  become: true
+  become_user: root
+

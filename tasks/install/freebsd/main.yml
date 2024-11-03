@@ -1,0 +1,7 @@
+- name: "Install the 'openssh-portable' application package"
+  ansible.builtin.package:
+    name: openssh-portable
+    state: present
+  become: true
+  become_user: root
+

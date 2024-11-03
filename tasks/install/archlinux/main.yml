@@ -1,0 +1,7 @@
+- name: "Install the 'openssh' package"
+  ansible.builtin.package:
+    name: openssh
+    state: present
+  become: true
+  become_user: root
+
