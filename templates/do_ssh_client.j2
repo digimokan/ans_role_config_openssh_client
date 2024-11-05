@@ -346,9 +346,9 @@ create_cd_and_import_in_fido_keypairs_import_dir() {
   try_silent_with_exit \
     "mkdir \"${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}\"" \
     "error attempting to create temp FIDO keypairs import dir" 7
-  try_silent_with_exit \
-    "cd \"${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}\"" \
-    "error attempting to change to FIDO keypairs import dir" 7
+
+  cd "${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}" || exit 7
+
   try_silent_with_exit \
     "\"${OPEN_SSH_CLIENT_KEYGEN_CMD}\" -K" \
     "error attempting to import keypairs from FIDO device" 7
@@ -455,6 +455,8 @@ do_import_refs_to_fido_device_keypairs() {
 }
 
 do_create_user_keypair() {
+  cd "${USER_KEYPAIRS_DIR}" || exit 7
+
   timestamp="$(date +%Y-%m-%d-%H%M)"
   comment="Normal (non-FIDO-device) keypair. Created on ${timestamp}."
   filename="ssh_user_key_${KEY_TYPE}_${KEY_DESCRIP}"
@@ -465,9 +467,6 @@ do_create_user_keypair() {
   cmd="${cmd} -N \"${PASSPHRASE}\""
   cmd="${cmd} -C \"${comment}\""
 
-  try_silent_with_exit \
-    "cd \"${USER_KEYPAIRS_DIR}\"" \
-    "error attempting to change to user keypairs dir" 7
   try_silent_with_exit \
     "${cmd}" \
     "error attempting to create user SSH keypair" 10
