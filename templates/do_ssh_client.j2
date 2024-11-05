@@ -466,6 +466,9 @@ do_create_user_keypair() {
   cmd="${cmd} -C \"${comment}\""
 
   try_silent_with_exit \
+    "cd \"${USER_KEYPAIRS_DIR}\"" \
+    "error attempting to change to user keypairs dir" 7
+  try_silent_with_exit \
     "${cmd}" \
     "error attempting to create user SSH keypair" 10
 }
