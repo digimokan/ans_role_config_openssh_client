@@ -84,7 +84,7 @@ print_usage() {
   printf "      delete any keypairs in user's ~/.ssh dir that are not on attached FIDO device\n"
   printf "EXIT CODES:\n"
   printf "    0  ok\n"
-  printf "    0  ok, new and/or updated keypairs copied from FIDO device\n"
+  printf "    1  ok, new and/or updated keypairs copied from FIDO device\n"
   printf "    5  usage, arguments, or options error\n"
   printf "    7  key list error\n"
   printf "   10  key creation erro\n"
@@ -354,6 +354,53 @@ create_cd_and_import_in_fido_keypairs_import_dir() {
     "error attempting to import keypairs from FIDO device" 7
 }
 
+copy_fido_keypairs_to_user_keypairs_with_overwrite() {
+  try_silent_with_exit \
+    "cp -f \"${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}/*\" \"${USER_KEYPAIRS_DIR}\"" \
+    "error attempting to copy FIDO device keypairs to user SSH keypairs dir" 25
+}
+
+append_fido_keypairs_to_user_keypairs() {
+  create_cd_and_import_in_fido_keypairs_import_dir
+
+  fido_keydir="${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}"
+  user_keydir="${USER_KEYPAIRS_DIR}"
+  diff --exclude 'known_hosts*' "${fido_keydir}" "${user_keydir}" | grep -q "${fido_keydir}"
+  exit_code="${?}"
+  if [ "${exit_code}" = 0  ]; then
+    appending_new_or_modified_keypairs='true'
+  else
+    appending_new_or_modified_keypairs='false'
+  fi
+
+  copy_fido_keypairs_to_user_keypairs_with_overwrite
+
+  if [ "${appending_new_or_modified_keypairs}" = 'true' ]; then
+    exit_with_cleanup 1
+  else
+    exit_with_cleanup 0
+  fi
+}
+
+replace_user_keypairs_with_fido_keypairs() {
+  create_cd_and_import_in_fido_keypairs_import_dir
+
+  if [ -z "$(diff --exclude 'known_hosts*' "${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}" "${USER_KEYPAIRS_DIR}")" ]; then
+    user_keypairs_will_be_changed='false'
+  else
+    user_keypairs_will_be_changed='true'
+  fi
+
+  do_delete_all_user_keypairs
+  copy_fido_keypairs_to_user_keypairs_with_overwrite
+
+  if [ "${user_keypairs_will_be_changed}" = 'true' ]; then
+    exit_with_cleanup 1
+  else
+    exit_with_cleanup 0
+  fi
+}
+
 delete_keyfile() {
   keyfile_type="${1}"
   keyfile_name="${2}"
@@ -400,15 +447,11 @@ do_list_fido_device_keypairs() {
 }
 
 do_import_refs_to_fido_device_keypairs() {
-  create_cd_and_import_in_fido_keypairs_import_dir
-
   if [ "${DELETE_KEYPAIRS_NOT_ON_FIDO_DEVICE}" = 'true' ]; then
-    do_delete_all_user_keypairs
+    replace_user_keypairs_with_fido_keypairs
+  else
+    append_fido_keypairs_to_user_keypairs
   fi
-
-  try_silent_with_exit \
-    "cp -f \"${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}/*\" \"${USER_KEYPAIRS_DIR}\"" \
-    "error attempting to copy FIDO device keypairs to user SSH keypairs dir" 25
 }
 
 do_create_user_keypair() {
