@@ -158,24 +158,6 @@ quit_with_err_msg() {
   exit "${err_code}"
 }
 
-quit_with_err_msg_and_help() {
-  err_msg="${1}"
-  err_code="${2}"
-  print_err_msg "${err_msg}"
-  printf "\n"
-  print_usage
-  exit "${err_code}"
-}
-
-quit_if_rc_not_0() {
-  cmd_exit_code="${1}"
-  err_msg="${2}"
-  script_exit_code="${3}"
-  if [ "${cmd_exit_code}" != 0 ]; then
-    quit_with_err_msg "${err_msg}" "${script_exit_code}"
-  fi
-}
-
 run_script_cleanup_actions() {
   rm -rf "${TEMP_FIDO_KEYPAIRS_IMPORT_DIR}" 1> /dev/null 2>&1
 }
@@ -189,26 +171,26 @@ try_silent_with_exit() {
   exit_code="${?}"
   if [ "${exit_code}" != 0 ]; then
     run_script_cleanup_actions
-    quit_err_msg_with_help "${err_msg}" "${err_code}"
+    quit_with_err_msg "${err_msg}" "${err_code}"
   fi
 }
 
 handle_unknown_option() {
   short_opt_letter_or_long_opt_name="${1}"
   err_msg="unknown option \"${short_opt_letter_or_long_opt_name}\""
-  quit_with_err_msg_and_help "${err_msg}" 5
+  quit_with_err_msg "${err_msg}" 5
 }
 
 handle_illegal_long_option_arg() {
   long_opt_name="${1}"
   err_msg="illegal argument in \"${long_opt_name}\""
-  quit_with_err_msg_and_help "${err_msg}" 5
+  quit_with_err_msg "${err_msg}" 5
 }
 
 handle_missing_long_option_arg() {
   long_opt_name="${1}"
   err_msg="missing argument for option \"${long_opt_name}\""
-  quit_with_err_msg_and_help "${err_msg}" 5
+  quit_with_err_msg "${err_msg}" 5
 }
 
 handle_print_help_menu() {
@@ -219,7 +201,7 @@ handle_print_help_menu() {
      [ "${CREATE_KEYPAIR_ON_FIDO_DEVICE}" = 'true' ] || \
      [ "${DELETE_USER_KEYPAIR}" = 'true' ] || \
      [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   PRINT_HELP_MENU='true'
 }
@@ -232,7 +214,7 @@ handle_list_user_keypairs() {
      [ "${CREATE_KEYPAIR_ON_FIDO_DEVICE}" = 'true' ] || \
      [ "${DELETE_USER_KEYPAIR}" = 'true' ] || \
      [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   LIST_USER_KEYPAIRS='true'
 }
@@ -245,7 +227,7 @@ handle_list_fido_device_keypairs() {
      [ "${CREATE_KEYPAIR_ON_FIDO_DEVICE}" = 'true' ] || \
      [ "${DELETE_USER_KEYPAIR}" = 'true' ] || \
      [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   LIST_FIDO_DEVICE_KEYPAIRS='true'
 }
@@ -258,7 +240,7 @@ handle_import_refs_to_fido_device_keypairs() {
      [ "${CREATE_KEYPAIR_ON_FIDO_DEVICE}" = 'true' ] || \
      [ "${DELETE_USER_KEYPAIR}" = 'true' ] || \
      [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   IMPORT_REFS_TO_FIDO_DEVICE_KEYPAIRS='true'
 }
@@ -271,7 +253,7 @@ handle_create_user_keypair() {
      [ "${CREATE_KEYPAIR_ON_FIDO_DEVICE}" = 'true' ] || \
      [ "${DELETE_USER_KEYPAIR}" = 'true' ] || \
      [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   KEY_DESCRIP="${1}"
   CREATE_USER_KEYPAIR='true'
@@ -285,7 +267,7 @@ handle_create_keypair_on_fido_device() {
      [ "${CREATE_USER_KEYPAIR}" = 'true' ] || \
      [ "${DELETE_USER_KEYPAIR}" = 'true' ] || \
      [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   KEY_DESCRIP="${1}"
   CREATE_KEYPAIR_ON_FIDO_DEVICE='true'
@@ -299,7 +281,7 @@ handle_delete_user_keypair() {
      [ "${CREATE_USER_KEYPAIR}" = 'true' ] || \
      [ "${CREATE_KEYPAIR_ON_FIDO_DEVICE}" = 'true' ] || \
      [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   KEY_FILENAME="${1}"
   DELETE_USER_KEYPAIR='true'
@@ -313,7 +295,7 @@ handle_delete_all_user_keypairs() {
      [ "${CREATE_USER_KEYPAIR}" = 'true' ] || \
      [ "${CREATE_KEYPAIR_ON_FIDO_DEVICE}" = 'true' ] || \
      [ "${DELETE_USER_KEYPAIR}" = 'true' ]; then
-    quit_with_err_msg_and_help "mutually exclusive options selected" 5
+    quit_with_err_msg "mutually exclusive options selected" 5
   fi
   DELETE_ALL_USER_KEYPAIRS='true'
 }
@@ -501,7 +483,7 @@ main() {
   elif [ "${DELETE_ALL_USER_KEYPAIRS}" = 'true' ]; then
     do_delete_all_user_keypairs
   else
-    quit_with_err_msg_and_help "no valid option selected" 5
+    quit_with_err_msg "no valid option selected" 5
   fi
 
   run_script_cleanup_actions
