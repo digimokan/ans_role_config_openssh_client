@@ -373,6 +373,7 @@ append_fido_keypairs_to_user_keypairs() {
     appending_new_or_modified_keypairs='false'
   fi
 
+  printf "Appending FIDO device keypairs to user keypairs...\n"
   copy_fido_keypairs_to_user_keypairs_with_overwrite
 
   if [ "${appending_new_or_modified_keypairs}" = 'true' ]; then
@@ -391,6 +392,7 @@ replace_user_keypairs_with_fido_keypairs() {
     user_keypairs_will_be_changed='true'
   fi
 
+  printf "Deleting all user keypairs, then replacing with FIDO device keypairs...\n"
   do_delete_all_user_keypairs
   copy_fido_keypairs_to_user_keypairs_with_overwrite
 
@@ -411,6 +413,7 @@ delete_keyfile() {
   fi
 
   if [ -f "${target_key_file_path}" ]; then
+    printf "Deleting %s keyfile %s...\n" "${keyfile_type}" "${target_key_file_path}"
     try_silent_with_exit \
       "rm \"${target_key_file_path}\"" \
       "error deleting ${keyfile_type} keyfile \"${target_key_file_path}\"" 15
@@ -502,6 +505,7 @@ do_delete_user_keypair() {
 }
 
 do_delete_all_user_keypairs() {
+  printf "Deleting all user keypairs...\n"
   try_silent_with_exit \
     "find \"${USER_KEYPAIRS_DIR}/\" -type f -not -name \"known_hosts*\" -delete" \
     "error attempting to delete all user SSH keypairs" 25
