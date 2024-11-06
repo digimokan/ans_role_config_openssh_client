@@ -437,8 +437,9 @@ do_list_user_keypairs() {
   if [ "${listing}" = '' ]; then
     printf "No keypairs found in user SSH keypairs dir '%s'.\n" "${USER_KEYPAIRS_DIR}"
   else
+    sorted_keypairs="$(printf %s "${listing}" | sort)"
     printf "Listing of user's SSH keypairs:\n"
-    printf "%s\n" "${listing}"
+    printf "%s\n" "${sorted_keypairs}"
   fi
 }
 
