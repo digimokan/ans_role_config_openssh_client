@@ -410,12 +410,14 @@ delete_keyfile() {
     target_key_file_path="${target_key_file_path}.pub"
   fi
 
-  try_silent_with_exit \
-    "ls \"${target_key_file_path}\"" \
-    "${keyfile_type} keyfile \"${target_key_file_path}\" does not exist" 15
-  try_silent_with_exit \
-    "rm \"${target_key_file_path}\"" \
-    "error deleting ${keyfile_type} keyfile \"${target_key_file_path}\"" 15
+  if [ -f "${target_key_file_path}" ]; then
+    try_silent_with_exit \
+      "rm \"${target_key_file_path}\"" \
+      "error deleting ${keyfile_type} keyfile \"${target_key_file_path}\"" 15
+  else
+    msg="${keyfile_type} keyfile \"${target_key_file_path}\" does not exist"
+    quit_with_err_msg "${msg}" 15
+  fi
 }
 
 do_print_help_menu() {
